@@ -1291,428 +1291,331 @@
     </div>
 
     <!-- Firebase SDK -->
-     <script type="module">
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "https://cdnjs.cloudflare.com/ajax/libs/firebase/9.22.2/firebase-app.js";
-import { getAnalytics } from "https://cdnjs.cloudflare.com/ajax/libs/firebase/9.22.2/firebase-analytics.js";
-import { 
-    getAuth, 
-    createUserWithEmailAndPassword, 
-    signInWithEmailAndPassword, 
-    onAuthStateChanged, 
-    signOut 
-} from "https://cdnjs.cloudflare.com/ajax/libs/firebase/9.22.2/firebase-auth.js";
-import { 
-    getFirestore, 
-    collection, 
-    doc, 
-    setDoc, 
-    getDoc, 
-    getDocs, 
-    updateDoc, 
-    arrayUnion, 
-    arrayRemove, 
-    query, 
-    where, 
-    orderBy, 
-    limit, 
-    onSnapshot, 
-    serverTimestamp, 
-    Timestamp 
-} from "https://cdnjs.cloudflare.com/ajax/libs/firebase/9.22.2/firebase-firestore.js";
-import { 
-    getStorage, 
-    ref, 
-    uploadBytes, 
-    getDownloadURL 
-} from "https://cdnjs.cloudflare.com/ajax/libs/firebase/9.22.2/firebase-storage.js";
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://cdnjs.cloudflare.com/ajax/libs/firebase/9.22.2/firebase-app.js";
+        import { getAnalytics } from "https://cdnjs.cloudflare.com/ajax/libs/firebase/9.22.2/firebase-analytics.js";
+        import { 
+            getAuth, 
+            createUserWithEmailAndPassword, 
+            signInWithEmailAndPassword, 
+            onAuthStateChanged, 
+            signOut 
+        } from "https://cdnjs.cloudflare.com/ajax/libs/firebase/9.22.2/firebase-auth.js";
+        import { 
+            getFirestore, 
+            collection, 
+            doc, 
+            setDoc, 
+            getDoc, 
+            getDocs, 
+            updateDoc, 
+            arrayUnion, 
+            arrayRemove, 
+            query, 
+            where, 
+            orderBy, 
+            limit, 
+            onSnapshot, 
+            serverTimestamp, 
+            Timestamp 
+        } from "https://cdnjs.cloudflare.com/ajax/libs/firebase/9.22.2/firebase-firestore.js";
+        import { 
+            getStorage, 
+            ref, 
+            uploadBytes, 
+            getDownloadURL 
+        } from "https://cdnjs.cloudflare.com/ajax/libs/firebase/9.22.2/firebase-storage.js";
 
-// Your web app's Firebase configuration
-const firebaseConfig = {
-    apiKey: "AIzaSyDh--JViumuDbQnSXOXHUEesgPUTt4wGDQ",
-    authDomain: "instaclone-a9e45.firebaseapp.com",
-    projectId: "instaclone-a9e45",
-    storageBucket: "instaclone-a9e45.appspot.com",
-    messagingSenderId: "423317743897",
-    appId: "1:423317743897:web:27e41fa2d8e1e28eeefd88",
-    measurementId: "G-KN7L13PLME"
-};
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDh--JViumuDbQnSXOXHUEesgPUTt4wGDQ",
+            authDomain: "instaclone-a9e45.firebaseapp.com",
+            projectId: "instaclone-a9e45",
+            storageBucket: "instaclone-a9e45.firebasestorage.app",
+            messagingSenderId: "423317743897",
+            appId: "1:423317743897:web:27e41fa2d8e1e28eeefd88",
+            measurementId: "G-KN7L13PLME"
+        };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
-const auth = getAuth();
-const db = getFirestore();
-const storage = getStorage();
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const auth = getAuth();
+        const db = getFirestore();
+        const storage = getStorage();
 
-// DOM Elements
-const mainContainer = document.getElementById('mainContainer');
-const authContainer = document.getElementById('authContainer');
-const loginForm = document.getElementById('loginForm');
-const registerForm = document.getElementById('registerForm');
-const loginBtn = document.getElementById('loginBtn');
-const registerBtn = document.getElementById('registerBtn');
-const logoutBtn = document.getElementById('logoutBtn');
-const hamburger = document.getElementById('hamburger');
-const navActions = document.getElementById('navActions');
-const searchInput = document.getElementById('searchInput');
-const searchResults = document.getElementById('searchResults');
-const homeIcon = document.getElementById('homeIcon');
-const chatIcon = document.getElementById('chatIcon');
-const notificationIcon = document.getElementById('notificationIcon');
-const profileIcon = document.getElementById('profileIcon');
-const darkModeToggle = document.getElementById('darkModeToggle');
-const notificationCount = document.getElementById('notificationCount');
-const editProfileModal = document.getElementById('editProfileModal');
+        // DOM Elements
+        const mainContainer = document.getElementById('mainContainer');
+        const authContainer = document.getElementById('authContainer);
+        const loginForm = document.getElementById('loginForm');
+        const registerForm = document.getElementById('registerForm');
+        const loginBtn = document.getElementById('loginBtn');
+        const registerBtn = document.getElementById('registerBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const hamburger = document.getElementById('hamburger');
+        const navActions = document.getElementById('navActions');
+        const searchInput = document.getElementById('searchInput');
+        const searchResults = document.getElementById('searchResults');
+        const homeIcon = document.getElementById('homeIcon');
+        const chatIcon = document.getElementById('chatIcon');
+        const notificationIcon = document.getElementById('notificationIcon');
+        const profileIcon = document.getElementById('profileIcon');
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        const notificationCount = document.getElementById('notificationCount');
+        const editProfileModal = document.getElementById('editProfileModal');
 
-let currentUser = null;
-let currentPage = 'auth';
-let currentProfileId = null;
+        let currentUser = null;
+        let currentPage = 'auth';
+        let currentProfileId = null;
 
-// Authentication
-onAuthStateChanged(auth, (user) => {
-    if (user) {
-        currentUser = user;
-        if (authContainer) authContainer.style.display = 'none';
-        if (mainContainer) mainContainer.style.display = 'block';
-        loadHomePage();
-        loadCurrentUserProfile();
-    } else {
-        currentUser = null;
-        if (authContainer) authContainer.style.display = 'block';
-        if (mainContainer) mainContainer.style.display = 'none';
-        currentPage = 'auth';
-    }
-});
+        // Authentication
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                currentUser = user;
+                authContainer.style.display = 'none';
+                mainContainer.style.display = 'block';
+                loadHomePage();
+                loadCurrentUserProfile();
+            } else {
+                currentUser = null;
+                authContainer.style.display = 'block';
+                mainContainer.style.display = 'none';
+                currentPage = 'auth';
+            }
+        });
 
-// Authentication event listeners
-if (loginBtn) {
-    loginBtn.addEventListener('click', async () => {
-        const email = document.getElementById('loginEmail').value;
-        const password = document.getElementById('loginPassword').value;
-        try {
-            await signInWithEmailAndPassword(auth, email, password);
-        } catch (error) {
-            alert(error.message);
-        }
-    });
-}
+        loginBtn.addEventListener('click', async () => {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+            } catch (error) {
+                alert(error.message);
+            }
+        });
 
-if (registerBtn) {
-    registerBtn.addEventListener('click', async () => {
-        const email = document.getElementById('registerEmail').value;
-        const password = document.getElementById('registerPassword').value;
-        const name = document.getElementById('registerName').value;
-        const dob = document.getElementById('registerDOB').value;
-        const location = document.getElementById('registerLocation').value;
-        const workplace = document.getElementById('registerWorkplace').value;
+        registerBtn.addEventListener('click', async () => {
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            const name = document.getElementById('registerName').value;
+            const dob = document.getElementById('registerDOB').value;
+            const location = document.getElementById('registerLocation').value;
+            const workplace = document.getElementById('registerWorkplace').value;
 
-        try {
-            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-            await setDoc(doc(db, 'users', userCredential.user.uid), {
-                name,
-                email,
-                dob,
-                location,
-                workplace,
-                createdAt: serverTimestamp(),
-                followers: [],
-                following: [],
-                profilePic: '/api/placeholder/120/120'
-            });
-        } catch (error) {
-            alert(error.message);
-        }
-    });
-}
+            try {
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                await setDoc(doc(db, 'users', userCredential.user.uid), {
+                    name,
+                    email,
+                    dob,
+                    location,
+                    workplace,
+                    createdAt: serverTimestamp(),
+                    followers: [],
+                    following: [],
+                    profilePic: '/api/placeholder/120/120'
+                });
+            } catch (error) {
+                alert(error.message);
+            }
+        });
 
-if (logoutBtn) {
-    logoutBtn.addEventListener('click', async () => {
-        await signOut(auth);
-    });
-}
+        logoutBtn.addEventListener('click', async () => {
+            await signOut(auth);
+        });
 
-// Navigation
-if (hamburger) {
-    hamburger.addEventListener('click', () => {
-        navActions.classList.toggle('mobile-active');
-    });
-}
+        // Navigation
+        hamburger.addEventListener('click', () => {
+            navActions.classList.toggle('mobile-active');
+        });
 
-if (homeIcon) homeIcon.addEventListener('click', loadHomePage);
-if (chatIcon) chatIcon.addEventListener('click', loadChatPage);
-if (notificationIcon) notificationIcon.addEventListener('click', loadNotificationsPage);
-if (profileIcon) profileIcon.addEventListener('click', () => {
-    if (currentUser) loadProfilePage(currentUser.uid);
-});
+        homeIcon.addEventListener('click', loadHomePage);
+        chatIcon.addEventListener('click', loadChatPage);
+        notificationIcon.addEventListener('click', loadNotificationsPage);
+        profileIcon.addEventListener('click', () => loadProfilePage(currentUser.uid));
 
-// Dark Mode
-if (darkModeToggle) {
-    darkModeToggle.addEventListener('click', () => {
-        document.body.classList.toggle('dark-mode');
-        const icon = darkModeToggle.querySelector('i');
-        if (icon) {
+        // Dark Mode
+        darkModeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            const icon = darkModeToggle.querySelector('i');
             icon.classList.toggle('fa-moon');
             icon.classList.toggle('fa-sun');
-        }
-    });
-}
+        });
 
-// Search
-if (searchInput) {
-    searchInput.addEventListener('input', async (e) => {
-        const searchTerm = e.target.value.trim();
-        if (searchTerm.length < 2) {
-            searchResults.style.display = 'none';
-            return;
-        }
+        // Search
+        searchInput.addEventListener('input', async (e) => {
+            const searchTerm = e.target.value.trim();
+            if (searchTerm.length < 2) {
+                searchResults.style.display = 'none';
+                return;
+            }
 
-        try {
             const q = query(collection(db, 'users'), where('name', '>=', searchTerm), limit(10));
             const snapshot = await getDocs(q);
             searchResults.innerHTML = '';
-            
             snapshot.forEach(doc => {
                 const user = doc.data();
                 const div = document.createElement('div');
                 div.className = 'search-result-item';
                 div.innerHTML = `
-                    <img src="${user.profilePic || '/api/placeholder/40/40'}" alt="${user.name}">
+                    <img src="${user.profilePic}" alt="${user.name}">
                     <span>${user.name}</span>
                 `;
                 div.addEventListener('click', () => loadProfilePage(doc.id));
                 searchResults.appendChild(div);
             });
-            
-            searchResults.style.display = snapshot.empty ? 'none' : 'block';
-        } catch (error) {
-            console.error("Search error:", error);
-        }
-    });
-
-    document.addEventListener('click', (e) => {
-        if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
-            searchResults.style.display = 'none';
-        }
-    });
-}
-
-// Page Loaders
-function loadHomePage() {
-    currentPage = 'home';
-    const template = document.getElementById('homeFeedTemplate');
-    if (template && mainContainer) {
-        const content = template.content.cloneNode(true);
-        mainContainer.innerHTML = '';
-        mainContainer.appendChild(content);
-        setupPostCreation();
-        loadPosts();
-    }
-}
-
-function loadProfilePage(userId) {
-    if (!userId) return;
-    
-    currentPage = 'profile';
-    currentProfileId = userId;
-    const template = document.getElementById('profileTemplate');
-    if (template && mainContainer) {
-        const content = template.content.cloneNode(true);
-        mainContainer.innerHTML = '';
-        mainContainer.appendChild(content);
-        loadProfileData(userId);
-    }
-}
-
-function loadChatPage() {
-    currentPage = 'chat';
-    const template = document.getElementById('chatTemplate');
-    if (template && mainContainer) {
-        const content = template.content.cloneNode(true);
-        mainContainer.innerHTML = '';
-        mainContainer.appendChild(content);
-        loadChatUsers();
-    }
-}
-
-function loadNotificationsPage() {
-    currentPage = 'notifications';
-    const template = document.getElementById('notificationsTemplate');
-    if (template && mainContainer) {
-        const content = template.content.cloneNode(true);
-        mainContainer.innerHTML = '';
-        mainContainer.appendChild(content);
-        loadNotifications();
-    }
-}
-
-// Post Creation
-function setupPostCreation() {
-    const postTextInput = document.getElementById('postTextInput');
-    const postImageInput = document.getElementById('postImageInput');
-    const uploadImageBtn = document.getElementById('uploadImageBtn');
-    const createPostBtn = document.getElementById('createPostBtn');
-    const imagePreview = document.getElementById('imagePreview');
-
-    if (!postTextInput || !postImageInput || !uploadImageBtn || !createPostBtn || !imagePreview) return;
-
-    uploadImageBtn.addEventListener('click', () => postImageInput.click());
-    
-    postImageInput.addEventListener('change', (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                imagePreview.src = e.target.result;
-                imagePreview.style.display = 'block';
-            };
-            reader.readAsDataURL(file);
-        }
-    });
-
-    createPostBtn.addEventListener('click', async () => {
-        const text = postTextInput.value.trim();
-        let imageUrl = null;
-
-        try {
-            if (postImageInput.files[0]) {
-                const imageRef = ref(storage, `posts/${Date.now()}_${postImageInput.files[0].name}`);
-                await uploadBytes(imageRef, postImageInput.files[0]);
-                imageUrl = await getDownloadURL(imageRef);
-            }
-
-            if (text || imageUrl) {
-                await setDoc(doc(collection(db, 'posts')), {
-                    userId: currentUser.uid,
-                    text,
-                    imageUrl,
-                    likes: [],
-                    comments: [],
-                    createdAt: serverTimestamp()
-                });
-                postTextInput.value = '';
-                postImageInput.value = '';
-                imagePreview.style.display = 'none';
-            }
-        } catch (error) {
-            console.error("Error creating post:", error);
-            alert("Failed to create post. Please try again.");
-        }
-    });
-}
-
-// Load Posts
-function loadPosts() {
-    const postsContainer = document.getElementById('postsContainer');
-    if (!postsContainer) return;
-
-    try {
-        const q = query(collection(db, 'posts'), orderBy('createdAt', 'desc'));
-        
-        onSnapshot(q, async (snapshot) => {
-            postsContainer.innerHTML = '';
-            
-            for (const docSnap of snapshot.docs) {
-                const post = docSnap.data();
-                try {
-                    const userDoc = await getDoc(doc(db, 'users', post.userId));
-                    if (userDoc.exists()) {
-                        const user = userDoc.data();
-                        const postTemplate = document.getElementById('postTemplate');
-                        
-                        if (postTemplate) {
-                            const postElement = postTemplate.content.cloneNode(true);
-                            
-                            // Set post data
-                            postElement.querySelector('.post-user-pic').src = user.profilePic || '/api/placeholder/40/40';
-                            postElement.querySelector('.post-username').textContent = user.name;
-                            postElement.querySelector('.post-username').href = `#/profile/${post.userId}`;
-                            postElement.querySelector('.post-username').addEventListener('click', (e) => {
-                                e.preventDefault();
-                                loadProfilePage(post.userId);
-                            });
-                            
-                            postElement.querySelector('.post-time').textContent = formatTimestamp(post.createdAt);
-                            postElement.querySelector('.post-text').textContent = post.text;
-                            
-                            if (post.imageUrl) {
-                                const img = postElement.querySelector('.post-image');
-                                img.src = post.imageUrl;
-                                img.style.display = 'block';
-                            }
-
-                            // Set up like button
-                            const likeBtn = postElement.querySelector('.like-btn');
-                            const likesCount = postElement.querySelector('.post-likes');
-                            likesCount.textContent = `${post.likes ? post.likes.length : 0} likes`;
-                            
-                            if (post.likes && post.likes.includes(currentUser.uid)) {
-                                likeBtn.classList.add('liked');
-                                likeBtn.querySelector('i').classList.replace('far', 'fas');
-                            }
-
-                            likeBtn.addEventListener('click', () => toggleLike(docSnap.id, post.likes || []));
-
-                            // Set up comment button
-                            const commentBtn = postElement.querySelector('.comment-btn');
-                            commentBtn.addEventListener('click', () => {
-                                postElement.querySelector('.comment-input').focus();
-                            });
-
-                            // Show existing comments
-                            const commentsContainer = postElement.querySelector('.post-comments');
-                            if (post.comments && Array.isArray(post.comments)) {
-                                post.comments.forEach(comment => {
-                                    const commentElement = document.createElement('div');
-                                    commentElement.className = 'comment';
-                                    commentElement.innerHTML = `
-                                        <span class="comment-username">${comment.userName}</span>
-                                        <span class="comment-text">${comment.text}</span>
-                                    `;
-                                    commentsContainer.appendChild(commentElement);
-                                });
-                            }
-
-                            // Set up comment input
-                            const commentInput = postElement.querySelector('.comment-input');
-                            const postCommentBtn = postElement.querySelector('.post-comment-btn');
-                            postCommentBtn.addEventListener('click', () => {
-                                if (commentInput.value.trim()) {
-                                    addComment(docSnap.id, commentInput.value.trim());
-                                    commentInput.value = '';
-                                }
-                            });
-
-                            commentInput.addEventListener('keypress', (e) => {
-                                if (e.key === 'Enter' && commentInput.value.trim()) {
-                                    addComment(docSnap.id, commentInput.value.trim());
-                                    commentInput.value = '';
-                                }
-                            });
-
-                            postsContainer.appendChild(postElement);
-                        }
-                    }
-                } catch (error) {
-                    console.error("Error rendering post:", error);
-                }
-            }
+            searchResults.style.display = 'block';
         });
-    } catch (error) {
-        console.error("Error loading posts:", error);
-    }
-}
 
-async function toggleLike(postId, currentLikes) {
-    if (!postId || !currentUser) return;
-    
-    try {
-        const postRef = doc(db, 'posts', postId);
-        const postDoc = await getDoc(postRef);
-        
-        if (postDoc.exists()) {
-            const postData = postDoc.data();
-            
+        // Page Loaders
+        function loadHomePage() {
+            currentPage = 'home';
+            const template = document.getElementById('homeFeedTemplate').content.cloneNode(true);
+            mainContainer.innerHTML = '';
+            mainContainer.appendChild(template);
+            setupPostCreation();
+            loadPosts();
+        }
+
+        function loadProfilePage(userId) {
+            currentPage = 'profile';
+            currentProfileId = userId;
+            const template = document.getElementById('profileTemplate').content.cloneNode(true);
+            mainContainer.innerHTML = '';
+            mainContainer.appendChild(template);
+            loadProfileData(userId);
+        }
+
+        function loadChatPage() {
+            currentPage = 'chat';
+            const template = document.getElementById('chatTemplate').content.cloneNode(true);
+            mainContainer.innerHTML = '';
+            mainContainer.appendChild(template);
+            loadChatUsers();
+        }
+
+        function loadNotificationsPage() {
+            currentPage = 'notifications';
+            const template = document.getElementById('notificationsTemplate').content.cloneNode(true);
+            mainContainer.innerHTML = '';
+            mainContainer.appendChild(template);
+            loadNotifications();
+        }
+
+        // Post Creation
+        function setupPostCreation() {
+            const postTextInput = document.getElementById('postTextInput');
+            const postImageInput = document.getElementById('postImageInput');
+            const uploadImageBtn = document.getElementById('uploadImageBtn');
+            const createPostBtn = document.getElementById('createPostBtn');
+            const imagePreview = document.getElementById('imagePreview');
+
+            uploadImageBtn.addEventListener('click', () => postImageInput.click());
+            postImageInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        imagePreview.src = e.target.result;
+                        imagePreview.style.display = 'block';
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            createPostBtn.addEventListener('click', async () => {
+                const text = postTextInput.value.trim();
+                let imageUrl = null;
+
+                if (postImageInput.files[0]) {
+                    const imageRef = ref(storage, `posts/${Date.now()}_${postImageInput.files[0].name}`);
+                    await uploadBytes(imageRef, postImageInput.files[0]);
+                    imageUrl = await getDownloadURL(imageRef);
+                }
+
+                if (text || imageUrl) {
+                    await setDoc(doc(collection(db, 'posts')), {
+                        userId: currentUser.uid,
+                        text,
+                        imageUrl,
+                        likes: [],
+                        comments: [],
+                        createdAt: serverTimestamp()
+                    });
+                    postTextInput.value = '';
+                    postImageInput.value = '';
+                    imagePreview.style.display = 'none';
+                }
+            });
+        }
+
+        // Load Posts
+        function loadPosts() {
+            const postsContainer = document.getElementById('postsContainer');
+            const q = query(collection(db, 'posts'), orderBy('createdAt', 'desc'));
+            onSnapshot(q, async (snapshot) => {
+                postsContainer.innerHTML = '';
+                for (const docSnap of snapshot.docs) {
+                    const post = docSnap.data();
+                    const userDoc = await getDoc(doc(db, 'users', post.userId));
+                    const user = userDoc.data();
+
+                    const postElement = document.getElementById('postTemplate').content.cloneNode(true);
+                    postElement.querySelector('.post-user-pic').src = user.profilePic;
+                    postElement.querySelector('.post-username').textContent = user.name;
+                    postElement.querySelector('.post-username').href = `#/profile/${post.userId}`;
+                    postElement.querySelector('.post-time').textContent = formatTimestamp(post.createdAt);
+                    postElement.querySelector('.post-text').textContent = post.text;
+                    
+                    if (post.imageUrl) {
+                        const img = postElement.querySelector('.post-image');
+                        img.src = post.imageUrl;
+                        img.style.display = 'block';
+                    }
+
+                    const likeBtn = postElement.querySelector('.like-btn');
+                    const likesCount = postElement.querySelector('.post-likes');
+                    likesCount.textContent = `${post.likes.length} likes`;
+                    if (post.likes.includes(currentUser.uid)) {
+                        likeBtn.classList.add('liked');
+                        likeBtn.querySelector('i').classList.replace('far', 'fas');
+                    }
+
+                    likeBtn.addEventListener('click', () => toggleLike(docSnap.id, post.likes));
+
+                    const commentBtn = postElement.querySelector('.comment-btn');
+                    commentBtn.addEventListener('click', () => {
+                        postElement.querySelector('.comment-input').focus();
+                    });
+
+                    const commentsContainer = postElement.querySelector('.post-comments');
+                    post.comments.forEach(comment => {
+                        const commentElement = document.createElement('div');
+                        commentElement.className = 'comment';
+                        commentElement.innerHTML = `
+                            <span class="comment-username">${comment.userName}</span>
+                            <span class="comment-text">${comment.text}</span>
+                        `;
+                        commentsContainer.appendChild(commentElement);
+                    });
+
+                    const commentInput = postElement.querySelector('.comment-input');
+                    const postCommentBtn = postElement.querySelector('.post-comment-btn');
+                    postCommentBtn.addEventListener('click', () => {
+                        if (commentInput.value.trim()) {
+                            addComment(docSnap.id, commentInput.value.trim());
+                            commentInput.value = '';
+                        }
+                    });
+
+                    postsContainer.appendChild(postElement);
+                }
+            });
+        }
+
+        async function toggleLike(postId, currentLikes) {
+            const postRef = doc(db, 'posts', postId);
             if (currentLikes.includes(currentUser.uid)) {
                 await updateDoc(postRef, {
                     likes: arrayRemove(currentUser.uid)
@@ -1721,27 +1624,14 @@ async function toggleLike(postId, currentLikes) {
                 await updateDoc(postRef, {
                     likes: arrayUnion(currentUser.uid)
                 });
-                // Only add notification if this isn't the current user's post
-                if (postData.userId !== currentUser.uid) {
-                    addNotification(postData.userId, 'liked your post');
-                }
+                addNotification(postRef.path.split('/')[1], 'liked your post');
             }
         }
-    } catch (error) {
-        console.error("Error toggling like:", error);
-    }
-}
 
-async function addComment(postId, text) {
-    if (!postId || !text || !currentUser) return;
-    
-    try {
-        const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
-        if (userDoc.exists()) {
+        async function addComment(postId, text) {
+            const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
             const user = userDoc.data();
             const postRef = doc(db, 'posts', postId);
-            const postDoc = await getDoc(postRef);
-            
             await updateDoc(postRef, {
                 comments: arrayUnion({
                     userId: currentUser.uid,
@@ -1750,580 +1640,244 @@ async function addComment(postId, text) {
                     createdAt: serverTimestamp()
                 })
             });
-            
-            // Add notification if this isn't the current user's post
-            if (postDoc.exists() && postDoc.data().userId !== currentUser.uid) {
-                addNotification(postDoc.data().userId, 'commented on your post');
-            }
+            addNotification(postRef.path.split('/')[1], 'commented on your post');
         }
-    } catch (error) {
-        console.error("Error adding comment:", error);
-    }
-}
 
-// Profile
-async function loadProfileData(userId) {
-    if (!userId) return;
-    
-    try {
-        const userDoc = await getDoc(doc(db, 'users', userId));
-        if (userDoc.exists()) {
+        // Profile
+        async function loadProfileData(userId) {
+            const userDoc = await getDoc(doc(db, 'users', userId));
             const user = userDoc.data();
 
-            const profileAvatar = document.getElementById('profileAvatar');
-            const profileUsername = document.getElementById('profileUsername');
-            const profileFullName = document.getElementById('profileFullName');
-            const profileDOB = document.getElementById('profileDOB');
-            const profileLocation = document.getElementById('profileLocation');
-            const profileWorkplace = document.getElementById('profileWorkplace');
-            const profileJoined = document.getElementById('profileJoined');
-            const followersCount = document.getElementById('followersCount');
-            const followingCount = document.getElementById('followingCount');
+            document.getElementById('profileAvatar').src = user.profilePic;
+            document.getElementById('profileUsername').textContent = user.name;
+            document.getElementById('profileFullName').textContent = user.name;
+            document.getElementById('profileDOB').textContent = user.dob;
+            document.getElementById('profileLocation').textContent = user.location;
+            document.getElementById('profileWorkplace').textContent = user.workplace;
+            document.getElementById('profileJoined').textContent = formatTimestamp(user.createdAt);
+            document.getElementById('followersCount').textContent = user.followers.length;
+            document.getElementById('followingCount').textContent = user.following.length;
+
             const followBtn = document.getElementById('followBtn');
             const editProfileBtn = document.getElementById('editProfileBtn');
-            const postsCount = document.getElementById('postsCount');
+            if (userId === currentUser.uid) {
+                followBtn.style.display = 'none';
+                editProfileBtn.style.display = 'inline-block';
+                editProfileBtn.addEventListener('click', showEditProfileModal);
+            } else {
+                followBtn.style.display = 'inline-block';
+                editProfileBtn.style.display = 'none';
+                followBtn.textContent = user.followers.includes(currentUser.uid) ? 'Unfollow' : 'Follow';
+                followBtn.addEventListener('click', () => toggleFollow(userId, user.followers));
+            }
+
+            const postsQuery = query(collection(db, 'posts'), where('userId', '==', userId));
+            const postsSnapshot = await getDocs(postsQuery);
+            document.getElementById('postsCount').textContent = postsSnapshot.size;
             const profilePosts = document.getElementById('profilePosts');
-
-            if (profileAvatar) profileAvatar.src = user.profilePic || '/api/placeholder/120/120';
-            if (profileUsername) profileUsername.textContent = user.name;
-            if (profileFullName) profileFullName.textContent = user.name;
-            if (profileDOB) profileDOB.textContent = user.dob;
-            if (profileLocation) profileLocation.textContent = user.location;
-            if (profileWorkplace) profileWorkplace.textContent = user.workplace;
-            if (profileJoined) profileJoined.textContent = formatTimestamp(user.createdAt);
-            if (followersCount) followersCount.textContent = user.followers ? user.followers.length : 0;
-            if (followingCount) followingCount.textContent = user.following ? user.following.length : 0;
-
-            if (followBtn && editProfileBtn) {
-                if (userId === currentUser.uid) {
-                    followBtn.style.display = 'none';
-                    editProfileBtn.style.display = 'inline-block';
-                    editProfileBtn.addEventListener('click', showEditProfileModal);
-                } else {
-                    followBtn.style.display = 'inline-block';
-                    editProfileBtn.style.display = 'none';
-                    followBtn.textContent = user.followers && user.followers.includes(currentUser.uid) ? 'Unfollow' : 'Follow';
-                    
-                    // Remove previous event listeners
-                    const newFollowBtn = followBtn.cloneNode(true);
-                    followBtn.parentNode.replaceChild(newFollowBtn, followBtn);
-                    newFollowBtn.addEventListener('click', () => toggleFollow(userId, user.followers || []));
-                }
-            }
-
-            // Load user posts
-            if (profilePosts) {
-                const postsQuery = query(collection(db, 'posts'), where('userId', '==', userId));
-                const postsSnapshot = await getDocs(postsQuery);
-                
-                if (postsCount) postsCount.textContent = postsSnapshot.size;
-                profilePosts.innerHTML = '';
-                
-                postsSnapshot.forEach(doc => {
-                    const post = doc.data();
-                    if (post.imageUrl) {
-                        const div = document.createElement('div');
-                        div.className = 'profile-post';
-                        div.innerHTML = `<img src="${post.imageUrl}" alt="Post">`;
-                        div.addEventListener('click', () => {
-                            // TODO: Implement post preview/detail view
-                            alert('Post detail view to be implemented');
-                        });
-                        profilePosts.appendChild(div);
-                    }
-                });
-            }
-        }
-    } catch (error) {
-        console.error("Error loading profile data:", error);
-    }
-}
-
-async function toggleFollow(userId, currentFollowers) {
-    if (!userId || !currentUser) return;
-    
-    try {
-        const userRef = doc(db, 'users', userId);
-        const currentUserRef = doc(db, 'users', currentUser.uid);
-        
-        if (currentFollowers.includes(currentUser.uid)) {
-            await updateDoc(userRef, { followers: arrayRemove(currentUser.uid) });
-            await updateDoc(currentUserRef, { following: arrayRemove(userId) });
-        } else {
-            await updateDoc(userRef, { followers: arrayUnion(currentUser.uid) });
-            await updateDoc(currentUserRef, { following: arrayUnion(userId) });
-            addNotification(userId, 'started following you');
-        }
-        loadProfilePage(userId);
-    } catch (error) {
-        console.error("Error toggling follow:", error);
-    }
-}
-
-// Edit Profile
-function showEditProfileModal() {
-    if (!editProfileModal) return;
-    
-    editProfileModal.style.display = 'flex';
-    const closeModal = document.getElementById('closeProfileModal');
-    const saveProfileBtn = document.getElementById('saveProfileBtn');
-    const profilePicInput = document.getElementById('profilePicInput');
-    const changePhotoBtn = document.getElementById('changePhotoBtn');
-
-    loadCurrentUserProfileToModal();
-
-    if (closeModal) {
-        closeModal.addEventListener('click', () => editProfileModal.style.display = 'none');
-    }
-    
-    if (changePhotoBtn && profilePicInput) {
-        changePhotoBtn.addEventListener('click', () => profilePicInput.click());
-    }
-    
-    if (profilePicInput) {
-        profilePicInput.addEventListener('change', previewProfilePic);
-    }
-    
-    if (saveProfileBtn) {
-        saveProfileBtn.addEventListener('click', saveProfileChanges);
-    }
-}
-
-async function loadCurrentUserProfileToModal() {
-    if (!currentUser) return;
-    
-    try {
-        const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
-        if (userDoc.exists()) {
-            const user = userDoc.data();
-            const profilePicPreview = document.getElementById('profilePicPreview');
-            const editFullName = document.getElementById('editFullName');
-            const editDOB = document.getElementById('editDOB');
-            const editLocation = document.getElementById('editLocation');
-            const editWorkplace = document.getElementById('editWorkplace');
-            
-            if (profilePicPreview) profilePicPreview.src = user.profilePic || '/api/placeholder/100/100';
-            if (editFullName) editFullName.value = user.name || '';
-            if (editDOB) editDOB.value = user.dob || '';
-            if (editLocation) editLocation.value = user.location || '';
-            if (editWorkplace) editWorkplace.value = user.workplace || '';
-        }
-    } catch (error) {
-        console.error("Error loading profile data to modal:", error);
-    }
-}
-
-function previewProfilePic(e) {
-    const file = e.target.files[0];
-    const profilePicPreview = document.getElementById('profilePicPreview');
-    
-    if (file && profilePicPreview) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            profilePicPreview.src = e.target.result;
-        };
-        reader.readAsDataURL(file);
-    }
-}
-
-async function saveProfileChanges() {
-    if (!currentUser || !editProfileModal) return;
-    
-    try {
-        const profilePicInput = document.getElementById('profilePicInput');
-        const profilePicPreview = document.getElementById('profilePicPreview');
-        const editFullName = document.getElementById('editFullName');
-        const editDOB = document.getElementById('editDOB');
-        const editLocation = document.getElementById('editLocation');
-        const editWorkplace = document.getElementById('editWorkplace');
-        
-        let profilePicUrl = profilePicPreview ? profilePicPreview.src : '/api/placeholder/100/100';
-        
-        if (profilePicInput && profilePicInput.files[0]) {
-            const imageRef = ref(storage, `profile_pics/${currentUser.uid}`);
-            await uploadBytes(imageRef, profilePicInput.files[0]);
-            profilePicUrl = await getDownloadURL(imageRef);
-        }
-
-        await updateDoc(doc(db, 'users', currentUser.uid), {
-            name: editFullName ? editFullName.value : '',
-            dob: editDOB ? editDOB.value : '',
-            location: editLocation ? editLocation.value : '',
-            workplace: editWorkplace ? editWorkplace.value : '',
-            profilePic: profilePicUrl
-        });
-        
-        editProfileModal.style.display = 'none';
-        loadProfilePage(currentUser.uid);
-    } catch (error) {
-        console.error("Error saving profile changes:", error);
-        alert("Failed to save profile changes. Please try again.");
-    }
-}
-
-async function loadCurrentUserProfile() {
-    if (!currentUser) return;
-    
-    try {
-        const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
-        const currentUserProfilePic = document.getElementById('currentUserProfilePic');
-        
-        if (userDoc.exists() && currentUserProfilePic) {
-            currentUserProfilePic.src = userDoc.data().profilePic || '/api/placeholder/40/40';
-        }
-    } catch (error) {
-        console.error("Error loading current user profile:", error);
-    }
-}
-
-// Chat
-function loadChatUsers() {
-    const chatSidebar = document.getElementById('chatSidebar');
-    if (!chatSidebar || !currentUser) return;
-    
-    try {
-        const q = query(collection(db, 'users'));
-        onSnapshot(q, (snapshot) => {
-            chatSidebar.innerHTML = '';
-            
-            snapshot.forEach(doc => {
-                if (doc.id !== currentUser.uid) {
-                    const user = doc.data();
+            postsSnapshot.forEach(doc => {
+                const post = doc.data();
+                if (post.imageUrl) {
                     const div = document.createElement('div');
-                    div.className = 'chat-user';
-                    div.innerHTML = `
-                        <img src="${user.profilePic || '/api/placeholder/40/40'}" alt="${user.name}" class="chat-user-avatar">
-                        <div class="chat-user-info">
-                            <div class="chat-user-name">${user.name}</div>
-                            <div class="chat-user-last-msg"></div>
-                        </div>
-                    `;
-                    div.addEventListener('click', () => loadChat(doc.id));
-                    chatSidebar.appendChild(div);
+                    div.className = 'profile-post';
+                    div.innerHTML = `<img src="${post.imageUrl}" alt="Post">`;
+                    profilePosts.appendChild(div);
                 }
             });
-        });
-    } catch (error) {
-        console.error("Error loading chat users:", error);
-    }
-}
+        }
 
-async function loadChat(userId) {
-    if (!userId || !currentUser) return;
-    
-    try {
-        const chatId = [currentUser.uid, userId].sort().join('_');
-        const chatUserDoc = await getDoc(doc(db, 'users', userId));
-        
-        if (chatUserDoc.exists()) {
-            const chatUser = chatUserDoc.data();
-            const chatUserAvatar = document.getElementById('chatUserAvatar');
-            const chatUserName = document.getElementById('chatUserName');
-            const chatMessages = document.getElementById('chatMessages');
-            const messageInput = document.getElementById('messageInput');
-            const sendMessageBtn = document.getElementById('sendMessageBtn');
+        async function toggleFollow(userId, currentFollowers) {
+            const userRef = doc(db, 'users', userId);
+            const currentUserRef = doc(db, 'users', currentUser.uid);
             
-            if (chatUserAvatar) chatUserAvatar.src = chatUser.profilePic || '/api/placeholder/40/40';
-            if (chatUserName) chatUserName.textContent = chatUser.name;
-            
-            // Create chat collection if it doesn't exist
-            await getDoc(doc(db, 'chats', chatId)).catch(() => {
-                setDoc(doc(db, 'chats', chatId), {
-                    participants: [currentUser.uid, userId],
-                    updatedAt: serverTimestamp()
-                });
-            });
-            
-            // Listen for messages
-            if (chatMessages) {
-                const messagesRef = collection(db, 'chats', chatId, 'messages');
-                const q = query(messagesRef, orderBy('createdAt'));
-                
-                onSnapshot(q, (snapshot) => {
-                    chatMessages.innerHTML = '';
-                    
-                    snapshot.forEach(doc => {
-                        const message = doc.data();
-                        const div = document.createElement('div');
-                        div.className = `message ${message.userId === currentUser.uid ? 'sent' : 'received'}`;
-                        div.innerHTML = `
-                            <div class="message-content">${message.text}</div>
-                            <div class="message-time">${formatTimestamp(message.createdAt)}</div>
-                        `;
-                        chatMessages.appendChild(div);
-                    });
-                    
-                    chatMessages.scrollTop = chatMessages.scrollHeight;
-                });
+            if (currentFollowers.includes(currentUser.uid)) {
+                await updateDoc(userRef, { followers: arrayRemove(currentUser.uid) });
+                await updateDoc(currentUserRef, { following: arrayRemove(userId) });
+            } else {
+                await updateDoc(userRef, { followers: arrayUnion(currentUser.uid) });
+                await updateDoc(currentUserRef, { following: arrayUnion(userId) });
+                addNotification(userId, 'started following you');
             }
-            
-            // Setup message sending
-            if (messageInput && sendMessageBtn) {
-                // Remove old event listeners
-                const newSendBtn = sendMessageBtn.cloneNode(true);
-                sendMessageBtn.parentNode.replaceChild(newSendBtn, sendMessageBtn);
-                
-                newSendBtn.onclick = () => {
-                    if (messageInput.value.trim()) {
-                        sendMessage(chatId, userId, messageInput.value.trim());
-                        messageInput.value = '';
-                    }
+            loadProfileData(userId);
+        }
+
+        // Edit Profile
+        function showEditProfileModal() {
+            editProfileModal.style.display = 'flex';
+            const closeModal = document.getElementById('closeProfileModal');
+            const saveProfileBtn = document.getElementById('saveProfileBtn');
+            const profilePicInput = document.getElementById('profilePicInput');
+            const changePhotoBtn = document.getElementById('changePhotoBtn');
+
+            loadCurrentUserProfileToModal();
+
+            closeModal.addEventListener('click', () => editProfileModal.style.display = 'none');
+            changePhotoBtn.addEventListener('click', () => profilePicInput.click());
+            profilePicInput.addEventListener('change', previewProfilePic);
+            saveProfileBtn.addEventListener('click', saveProfileChanges);
+        }
+
+        async function loadCurrentUserProfileToModal() {
+            const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
+            const user = userDoc.data();
+            document.getElementById('profilePicPreview').src = user.profilePic;
+            document.getElementById('editFullName').value = user.name;
+            document.getElementById('editDOB').value = user.dob;
+            document.getElementById('editLocation').value = user.location;
+            document.getElementById('editWorkplace').value = user.workplace;
+        }
+
+        function previewProfilePic(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    document.getElementById('profilePicPreview').src = e.target.result;
                 };
-                
-                messageInput.onkeypress = (e) => {
-                    if (e.key === 'Enter' && messageInput.value.trim()) {
-                        sendMessage(chatId, userId, messageInput.value.trim());
-                        messageInput.value = '';
-                    }
-                };
+                reader.readAsDataURL(file);
             }
         }
-    } catch (error) {
-        console.error("Error loading chat:", error);
-    }
-}
 
-async function sendMessage(chatId, recipientId, text) {
-    if (!chatId || !recipientId || !text || !currentUser) return;
-    
-    try {
-        // Add message to chat
-        await setDoc(doc(collection(db, 'chats', chatId, 'messages')), {
-            userId: currentUser.uid,
-            text,
-            createdAt: serverTimestamp()
-        });
-        
-        // Update chat last message
-        await updateDoc(doc(db, 'chats', chatId), {
-            lastMessage: text,
-            lastMessageAt: serverTimestamp(),
-            lastMessageBy: currentUser.uid
-        });
-        
-        // Add notification for recipient
-        addNotification(recipientId, 'sent you a message');
-    } catch (error) {
-        console.error("Error sending message:", error);
-    }
-}
+        async function saveProfileChanges() {
+            const profilePicInput = document.getElementById('profilePicInput');
+            let profilePicUrl = document.getElementById('profilePicPreview').src;
+            
+            if (profilePicInput.files[0]) {
+                const imageRef = ref(storage, `profile_pics/${currentUser.uid}`);
+                await uploadBytes(imageRef, profilePicInput.files[0]);
+                profilePicUrl = await getDownloadURL(imageRef);
+            }
 
-// Notifications
-async function loadNotifications() {
-    if (!currentUser) return;
-    
-    const notificationsContent = document.getElementById('notificationsContent');
-    if (!notificationsContent) return;
+            await updateDoc(doc(db, 'users', currentUser.uid), {
+                name: document.getElementById('editFullName').value,
+                dob: document.getElementById('editDOB').value,
+                location: document.getElementById('editLocation').value,
+                workplace: document.getElementById('editWorkplace').value,
+                profilePic: profilePicUrl
+            });
+            editProfileModal.style.display = 'none';
+            loadProfileData(currentUser.uid);
+        }
 
-    try {
-        const q = query(
-            collection(db, 'notifications'),
-            where('userId', '==', currentUser.uid),
-            orderBy('createdAt', 'desc'),
-            limit(50)
-        );
+        async function loadCurrentUserProfile() {
+            const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
+            document.getElementById('currentUserProfilePic').src = userDoc.data().profilePic;
+        }
 
-        onSnapshot(q, async (snapshot) => {
-            notificationsContent.innerHTML = '';
-            let count = 0;
-
-            for (const docSnap of snapshot.docs) {
-                const notification = docSnap.data();
-                try {
-                    const userDoc = await getDoc(doc(db, 'users', notification.fromUserId));
-                    if (userDoc.exists()) {
-                        const user = userDoc.data();
+        // Chat
+        function loadChatUsers() {
+            const chatSidebar = document.getElementById('chatSidebar');
+            const q = query(collection(db, 'users'));
+            onSnapshot(q, (snapshot) => {
+                chatSidebar.innerHTML = '';
+                snapshot.forEach(doc => {
+                    if (doc.id !== currentUser.uid) {
+                        const user = doc.data();
                         const div = document.createElement('div');
-                        div.className = 'notification';
+                        div.className = 'chat-user';
                         div.innerHTML = `
-                            <img src="${user.profilePic || '/api/placeholder/40/40'}" alt="${user.name}" class="notification-avatar">
-                            <div class="notification-content">
-                                <strong>${user.name}</strong> ${notification.message}
-                                <div class="notification-time">${formatTimestamp(notification.createdAt)}</div>
+                            <img src="${user.profilePic}" alt="${user.name}" class="chat-user-avatar">
+                            <div class="chat-user-info">
+                                <div class="chat-user-name">${user.name}</div>
+                                <div class="chat-user-last-msg"></div>
                             </div>
                         `;
-                        notificationsContent.appendChild(div);
-                        count++;
+                        div.addEventListener('click', () => loadChat(doc.id));
+                        chatSidebar.appendChild(div);
                     }
-                } catch (error) {
-                    console.error("Error rendering notification:", error);
-                }
-            }
-            if (notificationCount) {
-                notificationCount.textContent = count;
-            }
-        });
-    } catch (error) {
-        console.error("Error loading notifications:", error);
-    }
-}
+                });
+            });
+        }
 
-async function addNotification(userId, message) {
-    if (!userId || !currentUser || userId === currentUser.uid) return;
-
-    try {
-        await setDoc(doc(collection(db, 'notifications')), {
-            userId,
-            fromUserId: currentUser.uid,
-            message,
-            createdAt: serverTimestamp(),
-            read: false
-        });
-    } catch (error) {
-        console.error("Error adding notification:", error);
-    }
-}
-
-// Utility Functions
-function formatTimestamp(timestamp) {
-    if (!timestamp) return 'Just now';
-    
-    try {
-        const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
-        const now = new Date();
-        const diffMs = now - date;
-        
-        const seconds = Math.floor(diffMs / 1000);
-        const minutes = Math.floor(seconds / 60);
-        const hours = Math.floor(minutes / 60);
-        const days = Math.floor(hours / 24);
-
-        if (seconds < 60) return `${seconds}s ago`;
-        if (minutes < 60) return `${minutes}m ago`;
-        if (hours < 24) return `${hours}h ago`;
-        if (days < 7) return `${days}d ago`;
-        
-        return date.toLocaleDateString();
-    } catch (error) {
-        console.error("Error formatting timestamp:", error);
-        return '';
-    }
-}
-
-// Additional Event Listeners and Initialization
-document.addEventListener('DOMContentLoaded', () => {
-    // Tab switching for auth forms
-    const authTabs = document.querySelectorAll('.auth-tab');
-    const authForms = document.querySelectorAll('.auth-form');
-
-    authTabs.forEach(tab => {
-        tab.addEventListener('click', () => {
-            authTabs.forEach(t => t.classList.remove('active'));
-            authForms.forEach(f => f.classList.remove('active'));
+        async function loadChat(userId) {
+            const chatId = [currentUser.uid, userId].sort().join('_');
+            const chatUserDoc = await getDoc(doc(db, 'users', userId));
+            const chatUser = chatUserDoc.data();
             
-            tab.classList.add('active');
-            const formId = tab.dataset.tab === 'login' ? 'loginForm' : 'registerForm';
-            document.getElementById(formId).classList.add('active');
-        });
-    });
+            document.getElementById('chatUserAvatar').src = chatUser.profilePic;
+            document.getElementById('chatUserName').textContent = chatUser.name;
 
-    // Close modal when clicking outside
-    if (editProfileModal) {
-        editProfileModal.addEventListener('click', (e) => {
-            if (e.target === editProfileModal) {
-                editProfileModal.style.display = 'none';
+            const messagesRef = collection(db, 'chats', chatId, 'messages');
+            const q = query(messagesRef, orderBy('createdAt'));
+            onSnapshot(q, (snapshot) => {
+                const chatMessages = document.getElementById('chatMessages');
+                chatMessages.innerHTML = '';
+                snapshot.forEach(doc => {
+                    const message = doc.data();
+                    const div = document.createElement('div');
+                    div.className = `message ${message.userId === currentUser.uid ? 'sent' : 'received'}`;
+                    div.innerHTML = `
+                        <div class="message-content">${message.text}</div>
+                        <div class="message-time">${formatTimestamp(message.createdAt)}</div>
+                    `;
+                    chatMessages.appendChild(div);
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                });
+            });
+
+            const messageInput = document.getElementById('messageInput');
+            const sendMessageBtn = document.getElementById('sendMessageBtn');
+            sendMessageBtn.onclick = () => {
+                if (messageInput.value.trim()) {
+                    sendMessage(chatId, messageInput.value.trim());
+                    messageInput.value = '';
+                }
+            };
+        }
+
+        async function sendMessage(chatId, text) {
+            await setDoc(doc(collection(db, 'chats', chatId, 'messages')), {
+                userId: currentUser.uid,
+                text,
+                createdAt: serverTimestamp()
+            });
+            addNotification(chatId.split('_').find(id => id !== currentUser.uid), 'sent you a message');
+        }
+
+        // Notifications
+        async function loadNotifications() {
+            const notificationsContent = document.getElementById('notificationsContent');
+            const q = query(collection(db, 'notifications'), where('userId', '==', currentUser.uid), orderBy('createdAt', 'desc'));
+            onSnapshot(q, async (snapshot) => {
+                notificationsContent.innerHTML = '';
+                let count = 0;
+                for (const docSnap of snapshot.docs) {
+                    const notification = docSnap.data();
+                    const userDoc = await getDoc(doc(db, 'users', notification.fromUserId));
+                    const user = userDoc.data();
+                    const div = document.createElement('div');
+                    div.className = 'notification';
+                    div.innerHTML = `
+                        <img src="${user.profilePic}" alt="${user.name}" class="notification-avatar">
+                        <div class="notification-content">
+                            <strong>${user.name}</strong> ${notification.message}
+                            <div class="notification-time">${formatTimestamp(notification.createdAt)}</div>
+                        </div>
+                    `;
+                    notificationsContent.appendChild(div);
+                    count++;
+                }
+                notificationCount.textContent = count;
+            });
+        }
+
+        async function addNotification(userId, message) {
+            if (userId !== currentUser.uid) {
+                await setDoc(doc(collection(db, 'notifications')), {
+                    userId,
+                    fromUserId: currentUser.uid,
+                    message,
+                    createdAt: serverTimestamp()
+                });
             }
-        });
-    }
-
-    // Initialize dark mode based on user preference
-    if (localStorage.getItem('darkMode') === 'true') {
-        document.body.classList.add('dark-mode');
-        const icon = darkModeToggle?.querySelector('i');
-        if (icon) {
-            icon.classList.remove('fa-moon');
-            icon.classList.add('fa-sun');
         }
-    }
-});
 
-// Save dark mode preference
-darkModeToggle?.addEventListener('click', () => {
-    const isDarkMode = document.body.classList.contains('dark-mode');
-    localStorage.setItem('darkMode', isDarkMode);
-});
-
-// Error handling for Firebase operations
-function handleFirebaseError(error) {
-    console.error("Firebase Error:", error);
-    switch (error.code) {
-        case 'auth/invalid-email':
-            alert('Invalid email format');
-            break;
-        case 'auth/user-not-found':
-            alert('User not found');
-            break;
-        case 'auth/wrong-password':
-            alert('Incorrect password');
-            break;
-        case 'auth/email-already-in-use':
-            alert('Email already in use');
-            break;
-        case 'storage/unauthorized':
-            alert('Unauthorized access to storage');
-            break;
-        default:
-            alert('An error occurred: ' + error.message);
-    }
-}
-
-// Wrap existing async functions with error handling
-const originalFunctions = {
-    login: loginBtn?.onclick,
-    register: registerBtn?.onclick,
-    createPost: null,
-    saveProfile: null
-};
-
-if (loginBtn) {
-    loginBtn.onclick = async () => {
-        try {
-            await originalFunctions.login();
-        } catch (error) {
-            handleFirebaseError(error);
+        // Utility
+        function formatTimestamp(timestamp) {
+            if (!timestamp) return '';
+            const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+            return date.toLocaleString();
         }
-    };
-}
-
-if (registerBtn) {
-    registerBtn.onclick = async () => {
-        try {
-            await originalFunctions.register();
-        } catch (error) {
-            handleFirebaseError(error);
-        }
-    };
-}
-
-// Add cleanup function for when user logs out
-function cleanup() {
-    currentUser = null;
-    currentPage = 'auth';
-    currentProfileId = null;
-    if (mainContainer) mainContainer.innerHTML = '';
-    if (searchResults) searchResults.style.display = 'none';
-    if (notificationCount) notificationCount.textContent = '0';
-}
-
-logoutBtn?.addEventListener('click', async () => {
-    try {
-        await signOut(auth);
-        cleanup();
-    } catch (error) {
-        handleFirebaseError(error);
-    }
-});
-
-// Handle window resize for responsive design
-window.addEventListener('resize', () => {
-    if (window.innerWidth > 768 && navActions?.classList.contains('mobile-active')) {
-        navActions.classList.remove('mobile-active');
-    }
-});
-
-// Prevent form submissions
-loginForm?.addEventListener('submit', (e) => e.preventDefault());
-registerForm?.addEventListener('submit', (e) => e.preventDefault());
-        </script>
+    </script>
 </body>
 </html>
